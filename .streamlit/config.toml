@@ -1,0 +1,10 @@
+# Local-only UI: no usage statistics are sent anywhere.
+[browser]
+gatherUsageStats = false
+
+[server]
+address = "127.0.0.1"
+headless = true
+
+[client]
+toolbarMode = "minimal"

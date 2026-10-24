@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.venv
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local runtime state: audit database, HMAC key, logs
+var/
+*.db
+*.db-wal
+*.db-shm
+*.log
+
+# Local configuration (may contain the admin token)
+.env
+
+# Model artifacts are generated locally (scripts/train_classifier.py) or pulled with Ollama
+models/*
+!models/README.md
+*.gguf
+*.joblib
+
+# Third-party evaluation data (downloaded by scripts/download_external.py; licences vary)
+data/external/

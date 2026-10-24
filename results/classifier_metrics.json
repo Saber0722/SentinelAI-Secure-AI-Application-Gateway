@@ -1,0 +1,209 @@
+{
+  "model_version": "tfidf-lr-b2fd48c6-s13",
+  "algorithm": "TF-IDF (word 1-2 + char_wb 2-5 n-grams) + LogisticRegression(class_weight=balanced)",
+  "trained_at": "2026-10-23T07:43:29+00:00",
+  "artifact_sha256": "3f6429e5967746dbf4222f82bf49287d6b7ddadb7b4b15c3a853b5500a2e1965",
+  "dataset": {
+    "path": "data/training/prompts.jsonl",
+    "sha256": "b2fd48c6357cb8a970237342e40bea40f5949eeb5dd9ae8f9993548e4da65269",
+    "version": "train-v1",
+    "generator_seed": 42,
+    "rows_after_dedup": 1205,
+    "dropped_near_duplicates": 12
+  },
+  "split_seed": 13,
+  "splits": {
+    "train": {
+      "families": [
+        "benign:ai_questions",
+        "benign:coding",
+        "benign:config_tech",
+        "benign:decode",
+        "benign:doc_tasks",
+        "benign:everyday",
+        "benign:fiction",
+        "benign:ignore_words",
+        "benign:instructions",
+        "benign:modes",
+        "benign:password_help",
+        "benign:roleplay",
+        "benign:show_tell",
+        "benign:support",
+        "benign:tech_help",
+        "benign:writing",
+        "malicious:context_end",
+        "malicious:dual",
+        "malicious:encoded",
+        "malicious:extract",
+        "malicious:fiction",
+        "malicious:indirect",
+        "malicious:no_limits",
+        "malicious:obfuscated",
+        "malicious:override",
+        "malicious:persona",
+        "malicious:refusal",
+        "malicious:secret",
+        "malicious:told"
+      ],
+      "rows": 980,
+      "malicious": 528
+    },
+    "test": {
+      "families": [
+        "benign:customer",
+        "benign:knowledge",
+        "benign:math",
+        "benign:security_edu",
+        "malicious:authority",
+        "malicious:new_instructions",
+        "malicious:translated"
+      ],
+      "rows": 225,
+      "malicious": 97
+    }
+  },
+  "hyperparameters": {
+    "C": 30.0,
+    "C_grid": [
+      0.3,
+      1.0,
+      3.0,
+      10.0,
+      30.0
+    ]
+  },
+  "thresholds": {
+    "block": 0.95,
+    "warn": 0.93,
+    "selection": "grouped 5-fold CV over training families; block = lowest t with validation FPR <= 2%, warn = lowest t with FPR <= 5%"
+  },
+  "validation": {
+    "method": "GroupKFold(5) out-of-fold",
+    "at_block": {
+      "threshold": 0.95,
+      "precision": 0.9635,
+      "recall": 0.6004,
+      "f1": 0.7398,
+      "false_positive_rate": 0.0265,
+      "confusion_matrix": {
+        "tp": 317,
+        "fp": 12,
+        "tn": 440,
+        "fn": 211
+      }
+    },
+    "at_warn": {
+      "threshold": 0.93,
+      "precision": 0.9486,
+      "recall": 0.6648,
+      "f1": 0.7817,
+      "false_positive_rate": 0.042,
+      "confusion_matrix": {
+        "tp": 351,
+        "fp": 19,
+        "tn": 433,
+        "fn": 177
+      }
+    },
+    "roc_auc": 0.9285
+  },
+  "test": {
+    "at_block": {
+      "threshold": 0.95,
+      "precision": 1.0,
+      "recall": 0.7629,
+      "f1": 0.8655,
+      "false_positive_rate": 0.0,
+      "confusion_matrix": {
+        "tp": 74,
+        "fp": 0,
+        "tn": 128,
+        "fn": 23
+      }
+    },
+    "at_warn": {
+      "threshold": 0.93,
+      "precision": 1.0,
+      "recall": 0.8454,
+      "f1": 0.9162,
+      "false_positive_rate": 0.0,
+      "confusion_matrix": {
+        "tp": 82,
+        "fp": 0,
+        "tn": 128,
+        "fn": 15
+      }
+    },
+    "roc_auc": 0.9953,
+    "n": 225
+  },
+  "external_evaluation": {
+    "evaluation": {
+      "at_block": {
+        "threshold": 0.95,
+        "precision": 1.0,
+        "recall": 0.8125,
+        "f1": 0.8966,
+        "false_positive_rate": 0.0,
+        "confusion_matrix": {
+          "tp": 52,
+          "fp": 0,
+          "tn": 66,
+          "fn": 12
+        }
+      },
+      "at_warn": {
+        "threshold": 0.93,
+        "precision": 1.0,
+        "recall": 0.8594,
+        "f1": 0.9244,
+        "false_positive_rate": 0.0,
+        "confusion_matrix": {
+          "tp": 55,
+          "fp": 0,
+          "tn": 66,
+          "fn": 9
+        }
+      },
+      "roc_auc": 0.9915,
+      "n": 130
+    },
+    "holdout": {
+      "at_block": {
+        "threshold": 0.95,
+        "precision": 1.0,
+        "recall": 0.725,
+        "f1": 0.8406,
+        "false_positive_rate": 0.0,
+        "confusion_matrix": {
+          "tp": 29,
+          "fp": 0,
+          "tn": 40,
+          "fn": 11
+        }
+      },
+      "at_warn": {
+        "threshold": 0.93,
+        "precision": 1.0,
+        "recall": 0.775,
+        "f1": 0.8732,
+        "false_positive_rate": 0.0,
+        "confusion_matrix": {
+          "tp": 31,
+          "fp": 0,
+          "tn": 40,
+          "fn": 9
+        }
+      },
+      "roc_auc": 0.99,
+      "n": 80
+    }
+  },
+  "versions": {
+    "python": "3.12.12",
+    "scikit-learn": "1.9.1",
+    "numpy": "2.4.6"
+  },
+  "device": "cpu (GPU gives no benefit for a linear model on ~1k examples)",
+  "train_seconds": 3.21
+}

@@ -1,0 +1,49 @@
+{
+  "generated_at": "2026-10-23T08:19:59+00:00",
+  "model": "qwen2.5:1.5b",
+  "n_prompts": 20,
+  "max_tokens": 128,
+  "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU (8188 MiB, driver 615.78.08)",
+  "devices": {
+    "gpu": {
+      "device_requested": "gpu",
+      "placement": "gpu",
+      "cold_request_ms": 2396.8,
+      "cold_status": "allowed",
+      "n_warm": 19,
+      "errors": 0,
+      "inference_p50_ms": 458.154,
+      "inference_p95_ms": 715.477,
+      "inference_mean_ms": 410.4,
+      "gateway_p50_ms": 13.446,
+      "gateway_p95_ms": 23.421,
+      "tokens_per_s_p50": 176.486,
+      "tokens_per_s_mean": 172.2,
+      "output_tokens_total": 1373,
+      "vram_before_mib": 352,
+      "vram_loaded_mib": 1590,
+      "vram_model_mib": 1238
+    },
+    "cpu": {
+      "device_requested": "cpu",
+      "placement": "cpu",
+      "cold_request_ms": 2331.1,
+      "cold_status": "allowed",
+      "n_warm": 19,
+      "errors": 0,
+      "inference_p50_ms": 2107.395,
+      "inference_p95_ms": 3947.854,
+      "inference_mean_ms": 2163.3,
+      "gateway_p50_ms": 17.154,
+      "gateway_p95_ms": 29.78,
+      "tokens_per_s_p50": 32.107,
+      "tokens_per_s_mean": 31.5,
+      "output_tokens_total": 1332,
+      "vram_before_mib": 352,
+      "vram_loaded_mib": 352,
+      "vram_model_mib": 0
+    }
+  },
+  "speedup_tokens_per_s": 5.5,
+  "latency_reduction_pct": 78.3
+}

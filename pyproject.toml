@@ -1,0 +1,71 @@
+[project]
+name = "sentinelai"
+version = "0.1.0"
+description = "Local-first AI application security gateway: prompt-injection, PII and secret-leakage defences for LLM apps"
+readme = "README.md"
+authors = [
+    { name = "24f1001512", email = "24f1001515@ds.study.iitm.ac.in" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "en-core-web-sm",
+    "fastapi>=0.161.1",
+    "httpx>=0.28.1",
+    "joblib>=1.6.0",
+    "pandas>=3.1.0",
+    "plotly>=7.1.0",
+    "presidio-analyzer>=2.2.364",
+    "pydantic>=2.14.1",
+    "pydantic-settings>=2.16.1",
+    "scikit-learn>=1.9.1",
+    "streamlit>=1.66.1",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[project.scripts]
+sentinelai = "sentinelai.cli:main"
+
+[project.optional-dependencies]
+guards = [
+    "torch>=2.14.1",
+    "transformers>=5.20.2",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.24,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.17.2",
+]
+
+[tool.uv.sources]
+en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q -p no:cacheprovider"
+filterwarnings = [
+    "ignore:Using `httpx` with `starlette.testclient` is deprecated",
+]
+
+[tool.coverage.run]
+source = ["sentinelai"]
+# The Streamlit pages are exercised by a manual/headless smoke test, not unit tests.
+omit = ["*/sentinelai/ui/*", "*/sentinelai/cli.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+line-length = 125
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+# E501: the formatter owns line length; remaining long lines are string literals.
+ignore = ["E501", "RUF001", "RUF002", "RUF003"]  # homoglyph tables and examples are intentional
