@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-11-09T05:00:05+00:00",
+  "model": "qwen2.5:1.5b",
+  "n_prompts": 20,
+  "max_tokens": 128,
+  "hardware": "CPU only",
+  "devices": {
+    "cpu": {
+      "device_requested": "cpu",
+      "placement": "cpu",
+      "cold_request_ms": 11649.8,
+      "cold_status": "allowed",
+      "n_warm": 19,
+      "errors": 0,
+      "inference_p50_ms": 5762.039,
+      "inference_p95_ms": 9864.147,
+      "inference_mean_ms": 5720.6,
+      "gateway_p50_ms": 28.275,
+      "gateway_p95_ms": 37.819,
+      "tokens_per_s_p50": 12.014,
+      "tokens_per_s_mean": 11.5,
+      "output_tokens_total": 1344,
+      "vram_before_mib": null,
+      "vram_loaded_mib": null,
+      "vram_model_mib": null
+    }
+  }
+}

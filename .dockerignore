@@ -8,6 +8,7 @@ var
 htmlcov
 .coverage
 models/guards
+models/research
 data/external
 tests
 docs

@@ -1,0 +1,50 @@
+{
+ "args": {
+  "model": "microsoft/deberta-v3-small",
+  "name": "dsmall",
+  "fold": "C_llmail_yanis_dolly",
+  "epochs": 2,
+  "bs": 16,
+  "lr": 3e-05,
+  "max_len": 256,
+  "cap": 20000,
+  "hardneg_weight": 3.0,
+  "save": false
+ },
+ "train_rows": 20000,
+ "train_seconds": 244,
+ "val": {
+  "auc": 0.9453919085407471,
+  "n_val": 12122,
+  "recall@fpr1": 0.11973042730140522,
+  "hardneg_fpr@fpr1": 0.004866180048661801,
+  "recall@fpr5": 0.5650989389159736,
+  "hardneg_fpr@fpr5": 0.019464720194647202
+ },
+ "val_headtail": {
+  "auc": 0.9424695489005784,
+  "n_val": 12122,
+  "recall@fpr1": 0.09779179810725552,
+  "hardneg_fpr@fpr1": 0.004866180048661801,
+  "recall@fpr5": 0.5263837109262977,
+  "hardneg_fpr@fpr5": 0.019464720194647202
+ },
+ "by_source": {
+  "llmail": {
+   "n": 6160,
+   "mean_score": 0.3337749909764501
+  },
+  "yanismiraoui": {
+   "n": 974,
+   "mean_score": 0.5856505460372522
+  },
+  "dolly": {
+   "n": 4988,
+   "mean_score": 0.03400794643848763
+  },
+  "hardneg": {
+   "n": 411,
+   "mean_score": 0.016968083821867742
+  }
+ }
+}

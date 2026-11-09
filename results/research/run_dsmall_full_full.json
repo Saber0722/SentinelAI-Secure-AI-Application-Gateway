@@ -1,0 +1,16 @@
+{
+ "args": {
+  "model": "microsoft/deberta-v3-small",
+  "name": "dsmall_full",
+  "fold": "full",
+  "epochs": 2,
+  "bs": 16,
+  "lr": 3e-05,
+  "max_len": 256,
+  "cap": 0,
+  "hardneg_weight": 3.0,
+  "save": true
+ },
+ "train_rows": 42975,
+ "train_seconds": 532
+}

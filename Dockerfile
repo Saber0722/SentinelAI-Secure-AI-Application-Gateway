@@ -4,6 +4,7 @@ FROM python:3.12-slim
 COPY --from=ghcr.io/astral-sh/uv:0.13.5 /uv /usr/local/bin/uv
 
 ENV UV_COMPILE_BYTECODE=1 \
+    UV_NO_CACHE=1 \
     UV_LINK_MODE=copy \
     UV_PYTHON_DOWNLOADS=never \
     PYTHONUNBUFFERED=1 \
@@ -21,7 +22,11 @@ COPY data ./data
 COPY results ./results
 COPY .streamlit ./.streamlit
 COPY models/classifier ./models/classifier
+COPY models/cascade ./models/cascade
 RUN uv sync --frozen --no-dev
+# CPU-only inference for the cascade: the default torch wheel bundles several GB of unused CUDA libraries.
+RUN uv pip install --python /app/.venv torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu \
+    && uv pip install --python /app/.venv transformers==5.20.2
 
 RUN useradd --create-home --uid 10001 sentinel \
     && mkdir -p /app/var \

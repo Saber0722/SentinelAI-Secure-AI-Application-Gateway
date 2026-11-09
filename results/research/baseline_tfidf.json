@@ -1,0 +1,34 @@
+{
+ "A_wambosec": {
+  "auc": 0.9372669281163151,
+  "n_val": 5766,
+  "recall@fpr1": 0.46409807355516636,
+  "hardneg_fpr@fpr1": 0.012165450121654502,
+  "recall@fpr5": 0.6894337419731466,
+  "hardneg_fpr@fpr5": 0.038929440389294405
+ },
+ "B_inthewild": {
+  "auc": 0.7805848665377705,
+  "n_val": 6929,
+  "recall@fpr1": 0.15228426395939088,
+  "hardneg_fpr@fpr1": 0.0,
+  "recall@fpr5": 0.39593908629441626,
+  "hardneg_fpr@fpr5": 0.0
+ },
+ "C_llmail_yanis_dolly": {
+  "auc": 0.6170420369230234,
+  "n_val": 12122,
+  "recall@fpr1": 0.06911385144823631,
+  "hardneg_fpr@fpr1": 0.021897810218978103,
+  "recall@fpr5": 0.15156294809291654,
+  "hardneg_fpr@fpr5": 0.038929440389294405
+ },
+ "D_mosscap_alespalla": {
+  "auc": 0.6109336004808655,
+  "n_val": 14991,
+  "recall@fpr1": 0.08074534161490683,
+  "hardneg_fpr@fpr1": 0.0024330900243309003,
+  "recall@fpr5": 0.16810258465237427,
+  "hardneg_fpr@fpr5": 0.012165450121654502
+ }
+}

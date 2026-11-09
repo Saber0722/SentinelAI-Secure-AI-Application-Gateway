@@ -1,0 +1,46 @@
+{
+ "args": {
+  "model": "microsoft/deberta-v3-small",
+  "name": "dsmall",
+  "fold": "D_mosscap_alespalla",
+  "epochs": 2,
+  "bs": 16,
+  "lr": 3e-05,
+  "max_len": 256,
+  "cap": 20000,
+  "hardneg_weight": 3.0,
+  "save": false
+ },
+ "train_rows": 20000,
+ "train_seconds": 274,
+ "val": {
+  "auc": 0.7218056702063715,
+  "n_val": 14991,
+  "recall@fpr1": 0.15447806050891605,
+  "hardneg_fpr@fpr1": 0.0024330900243309003,
+  "recall@fpr5": 0.2955319575235424,
+  "hardneg_fpr@fpr5": 0.004866180048661801
+ },
+ "val_headtail": {
+  "auc": 0.7215935483870967,
+  "n_val": 14991,
+  "recall@fpr1": 0.152474454017231,
+  "hardneg_fpr@fpr1": 0.0024330900243309003,
+  "recall@fpr5": 0.29412943297936284,
+  "hardneg_fpr@fpr5": 0.004866180048661801
+ },
+ "by_source": {
+  "mosscap": {
+   "n": 4991,
+   "mean_score": 0.2905615408783641
+  },
+  "alespalla": {
+   "n": 10000,
+   "mean_score": 0.05283256026887357
+  },
+  "hardneg": {
+   "n": 411,
+   "mean_score": 0.004655775179999359
+  }
+ }
+}

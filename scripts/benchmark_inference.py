@@ -21,7 +21,8 @@ from pathlib import Path
 
 from sentinelai.audit import AuditLogger, NullAuditLogger, percentile
 from sentinelai.config import SecurityPolicy, get_settings
-from sentinelai.detectors.ml_classifier import ClassifierUnavailable, MlClassifier
+from sentinelai.detectors.cascade import load_detector
+from sentinelai.detectors.ml_classifier import ClassifierUnavailable
 from sentinelai.detectors.pii import PiiDetector
 from sentinelai.detectors.secrets import SecretsConfig
 from sentinelai.environment import detect_nvidia_gpus, nvidia_smi_diagnostic
@@ -137,7 +138,7 @@ def main() -> None:
 
     secrets = SecretsConfig.load(s.protected_secrets_path)
     try:
-        classifier = MlClassifier.load(s.classifier_dir)
+        classifier = load_detector(s)
     except ClassifierUnavailable:
         classifier = None
     pii = PiiDetector(s.spacy_model)

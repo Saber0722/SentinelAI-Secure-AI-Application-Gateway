@@ -11,7 +11,8 @@ from typing import Any
 from sentinelai.api.limits import SlidingWindowLimiter
 from sentinelai.audit import AuditLogger
 from sentinelai.config import Settings
-from sentinelai.detectors.ml_classifier import ClassifierUnavailable, MlClassifier
+from sentinelai.detectors.cascade import load_detector
+from sentinelai.detectors.ml_classifier import ClassifierUnavailable
 from sentinelai.detectors.pii import PiiDetector
 from sentinelai.detectors.secrets import SecretsConfig
 from sentinelai.evaluation.report import compact, record_runs, run_suite
@@ -44,7 +45,7 @@ class AppState:
 
         classifier, classifier_error = None, None
         try:
-            classifier = MlClassifier.load(settings.classifier_dir)
+            classifier = load_detector(settings)
         except ClassifierUnavailable as exc:
             classifier_error = str(exc)
         policy = settings.initial_policy()
@@ -98,6 +99,11 @@ class AppState:
             "algorithm": clf.metadata.get("algorithm"),
             "dataset": clf.metadata.get("dataset"),
             "trained_at": clf.metadata.get("trained_at"),
+            "kind": clf.metadata.get("kind", "tfidf"),
+            "cascade_thresholds": clf.metadata.get("thresholds") if clf.metadata.get("kind") == "cascade" else None,
+            "public_benchmark": clf.metadata.get("public_benchmark"),
+            "training_sources": clf.metadata.get("training_sources"),
+            "built_at": clf.metadata.get("built_at"),
         }
 
     def run_evaluation(self, include_classifier: bool = True) -> dict[str, Any]:

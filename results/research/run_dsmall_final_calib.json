@@ -1,0 +1,74 @@
+{
+ "args": {
+  "model": "microsoft/deberta-v3-small",
+  "name": "dsmall_final",
+  "fold": "calib",
+  "epochs": 2,
+  "bs": 16,
+  "lr": 3e-05,
+  "max_len": 256,
+  "cap": 0,
+  "hardneg_weight": 3.0,
+  "save": true
+ },
+ "train_rows": 38607,
+ "train_seconds": 472,
+ "val": {
+  "auc": 0.9948774358921608,
+  "n_val": 6516,
+  "recall@fpr1": 0.9434850863422292,
+  "hardneg_fpr@fpr1": 0.0,
+  "recall@fpr5": 0.9768445839874411,
+  "hardneg_fpr@fpr5": 0.010273972602739725
+ },
+ "val_headtail": {
+  "auc": 0.9953507079398136,
+  "n_val": 6516,
+  "recall@fpr1": 0.9587912087912088,
+  "hardneg_fpr@fpr1": 0.010273972602739725,
+  "recall@fpr5": 0.978414442700157,
+  "hardneg_fpr@fpr5": 0.010273972602739725
+ },
+ "by_source": {
+  "mosscap": {
+   "n": 748,
+   "mean_score": 0.9430717751827391
+  },
+  "inthewild": {
+   "n": 1038,
+   "mean_score": 0.18152163746684705
+  },
+  "llmail": {
+   "n": 924,
+   "mean_score": 0.9700730220268454
+  },
+  "wambosec": {
+   "n": 864,
+   "mean_score": 0.5892507526835928
+  },
+  "yanismiraoui": {
+   "n": 146,
+   "mean_score": 0.979468338359853
+  },
+  "alespalla": {
+   "n": 1500,
+   "mean_score": 0.004064794758911982
+  },
+  "dolly": {
+   "n": 748,
+   "mean_score": 0.004429135556792825
+  },
+  "own_templates": {
+   "n": 182,
+   "mean_score": 0.5167547354851574
+  },
+  "hardneg": {
+   "n": 292,
+   "mean_score": 0.0068938814730581605
+  },
+  "short_benign": {
+   "n": 366,
+   "mean_score": 0.00015196069039543074
+  }
+ }
+}

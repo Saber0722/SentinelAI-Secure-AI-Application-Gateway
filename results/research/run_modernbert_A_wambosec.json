@@ -1,0 +1,42 @@
+{
+ "args": {
+  "model": "answerdotai/ModernBERT-base",
+  "name": "modernbert",
+  "fold": "A_wambosec",
+  "epochs": 2,
+  "bs": 16,
+  "lr": 3e-05,
+  "max_len": 256,
+  "cap": 20000,
+  "hardneg_weight": 3.0,
+  "save": false
+ },
+ "train_rows": 20000,
+ "train_seconds": 328,
+ "val": {
+  "auc": 0.9521467311309693,
+  "n_val": 5766,
+  "recall@fpr1": 0.5227670753064798,
+  "hardneg_fpr@fpr1": 0.004866180048661801,
+  "recall@fpr5": 0.7338003502626971,
+  "hardneg_fpr@fpr5": 0.012165450121654502
+ },
+ "val_headtail": {
+  "auc": 0.9519018715603654,
+  "n_val": 5766,
+  "recall@fpr1": 0.5201401050788091,
+  "hardneg_fpr@fpr1": 0.004866180048661801,
+  "recall@fpr5": 0.7308814944541739,
+  "hardneg_fpr@fpr5": 0.012165450121654502
+ },
+ "by_source": {
+  "wambosec": {
+   "n": 5766,
+   "mean_score": 0.6117422237238502
+  },
+  "hardneg": {
+   "n": 411,
+   "mean_score": 0.023817590676553656
+  }
+ }
+}

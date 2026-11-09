@@ -152,6 +152,11 @@ class Settings(BaseSettings):
     spacy_model: str = "en_core_web_sm"
     # Used only if a trained artifact exists in classifier_dir; otherwise rules-only.
     classifier_enabled: bool = True
+    # tfidf: the small built-in classifier. cascade: transformers (needs torch; see scripts/build_cascade.py).
+    classifier_kind: Literal["tfidf", "cascade"] = "tfidf"
+    cascade_dir: Path = PROJECT_ROOT / "models" / "cascade"
+    torch_device: str = "cpu"
+    torch_threads: int = Field(0, ge=0)
     audit_store_redacted_prompt: bool = False
     admin_token: SecretStr | None = None
 

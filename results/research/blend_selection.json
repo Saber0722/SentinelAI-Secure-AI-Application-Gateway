@@ -1,0 +1,109 @@
+{
+ "rule": {
+  "auc": 0.572459068373112,
+  "recall_macro": 0.2771666666666667,
+  "macro_fpr": 0.017057833234303824,
+  "hardneg_fpr": 0.00684931506849315,
+  "warn": 0.5,
+  "block": 0.978,
+  "by_source": {
+   "wambosec": 0.363,
+   "inthewild": 0.463,
+   "llmail": 0.099,
+   "yanismiraoui": 0.034,
+   "mosscap": 0.055,
+   "own_templates": 0.649
+  }
+ },
+ "tfidf": {
+  "auc": 0.990167721705252,
+  "recall_macro": 0.9119999999999999,
+  "macro_fpr": 0.01963895194614149,
+  "hardneg_fpr": 0.0410958904109589,
+  "warn": 0.5228319708954225,
+  "block": 0.8874584203371815,
+  "by_source": {
+   "wambosec": 0.981,
+   "inthewild": 0.626,
+   "llmail": 0.99,
+   "yanismiraoui": 0.973,
+   "mosscap": 0.902,
+   "own_templates": 1.0
+  }
+ },
+ "dsmall": {
+  "auc": 0.995307557656226,
+  "recall_macro": 0.9436666666666667,
+  "macro_fpr": 0.019970287761137434,
+  "hardneg_fpr": 0.003424657534246575,
+  "warn": 0.5659806972742075,
+  "block": 0.9831393444240093,
+  "by_source": {
+   "wambosec": 0.998,
+   "inthewild": 0.762,
+   "llmail": 0.994,
+   "yanismiraoui": 0.959,
+   "mosscap": 0.949,
+   "own_templates": 1.0
+  }
+ },
+ "protectai": {
+  "auc": 0.9473229554948682,
+  "recall_macro": 0.6214999999999999,
+  "macro_fpr": 0.004964171630838297,
+  "hardneg_fpr": 0.04794520547945205,
+  "warn": 0.9982939542531967,
+  "block": 0.9999988079071045,
+  "by_source": {
+   "wambosec": 0.75,
+   "inthewild": 0.469,
+   "llmail": 0.16,
+   "yanismiraoui": 0.952,
+   "mosscap": 0.568,
+   "own_templates": 0.83
+  }
+ },
+ "own": {
+  "auc": 0.9958428375498592,
+  "recall_macro": 0.9516666666666667,
+  "macro_fpr": 0.018321952557246675,
+  "hardneg_fpr": 0.00684931506849315,
+  "warn": 0.4280268195875112,
+  "block": 0.909495350898912,
+  "by_source": {
+   "wambosec": 1.0,
+   "inthewild": 0.776,
+   "llmail": 0.996,
+   "yanismiraoui": 0.979,
+   "mosscap": 0.959,
+   "own_templates": 1.0
+  },
+  "coef": {
+   "rule": -0.39333639169594514,
+   "tfidf": 0.4266215400089711,
+   "dsmall": 0.36513765832375883
+  }
+ },
+ "with_guard": {
+  "auc": 0.995851807595149,
+  "recall_macro": 0.9496666666666665,
+  "macro_fpr": 0.019654724723352175,
+  "hardneg_fpr": 0.00684931506849315,
+  "warn": 0.44576202869925774,
+  "block": 0.8960206487051204,
+  "by_source": {
+   "wambosec": 0.998,
+   "inthewild": 0.776,
+   "llmail": 0.996,
+   "yanismiraoui": 0.973,
+   "mosscap": 0.955,
+   "own_templates": 1.0
+  },
+  "coef": {
+   "rule": -0.5719046933711079,
+   "tfidf": 0.41152571449201236,
+   "dsmall": 0.3567087660191513,
+   "protectai": 0.028088307574992286
+  }
+ }
+}

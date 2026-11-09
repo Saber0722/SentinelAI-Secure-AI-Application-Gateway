@@ -74,6 +74,13 @@ def decide_input(
         p = max(f.score for f in ml)
         risk = max(risk, p)
         ml_action = _threshold_action(p, ml_block_threshold, ml_warn_threshold)
+        # The cascade's training data pairs email addresses with exfiltration, so personal details alone
+        # can look like an attack. Without an attack rule, it warns instead of blocking a customer.
+        cascade_hit = any("ML:cascade" in f.rule_ids for f in ml)
+        has_pii = any(f.category is Category.PII for f in findings)
+        if ml_action is Action.BLOCK and cascade_hit and has_pii and not attack:
+            ml_action = Action.ALLOW_WITH_WARNING
+            reasons.append("Personal data present and no attack rule fired -> cascade block lowered to a warning")
         reasons.append(f"Classifier probability {p:.2f} -> {ml_action.value}")
         actions.append(ml_action)
         if (

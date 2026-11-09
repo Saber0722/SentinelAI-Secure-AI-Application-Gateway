@@ -16,6 +16,7 @@ from pathlib import Path
 
 from sentinelai.audit import AuditLogger, NullAuditLogger, percentile
 from sentinelai.config import SecurityPolicy, get_settings
+from sentinelai.detectors.cascade import load_detector
 from sentinelai.detectors.ml_classifier import ClassifierUnavailable, MlClassifier
 from sentinelai.detectors.pii import PiiDetector
 from sentinelai.detectors.secrets import SecretsConfig
@@ -111,6 +112,8 @@ def live_section(live: dict) -> str:
 
 
 def classifier_section(clf: MlClassifier | None) -> str:
+    if clf is not None and clf.metadata.get("kind") == "cascade":
+        return f"## Detector\n\n`{clf.version}` — {clf.metadata['algorithm']}."
     if clf is None:
         return "## ML classifier\n\nNo trained classifier found; `protected_ml` was not evaluated."
     m = clf.metadata
@@ -150,7 +153,7 @@ def main() -> None:
     classifier = None
     if not args.no_classifier:
         try:
-            classifier = MlClassifier.load(settings.classifier_dir)
+            classifier = load_detector(settings)
         except ClassifierUnavailable as exc:
             print(f"note: {exc}", file=sys.stderr)
 

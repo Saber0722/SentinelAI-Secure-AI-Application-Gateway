@@ -409,12 +409,38 @@ def _benchmark(bench: dict, status: dict | None) -> None:
 
 
 # ---------------------------------------------------------------------------------- classifier
+def _cascade(clf: dict) -> None:
+    th = clf["cascade_thresholds"]
+    k = st.columns(4)
+    k[0].metric("Own model threshold", f"{th['own']:.2f}", border=True)
+    k[1].metric("Guard model threshold", f"{th['guard']:.2f}", border=True)
+    k[2].metric("Veto threshold", f"{th['veto']:.3f}", border=True)
+    k[3].metric("Status", "enabled" if clf["enabled"] else "disabled", border=True)
+    st.caption(f"`{clf['version']}` · {clf.get('algorithm', '')} · built {clf.get('built_at', '—')}")
+    box = _card(
+        "Public benchmark (5,027 unseen prompts, macro average)",
+        "Models and thresholds frozen before each run; this test set has been used twice",
+    )
+    rows = [
+        {"system": name, "recall": m["recall"], "precision": m["precision"], "FPR": m["fpr"], "AUC": m["roc_auc"],
+         "NotInject over-blocking": m["notinject_fpr"], "averaged over": ", ".join(m["macro_over"])}
+        for name, m in (clf.get("public_benchmark") or {}).items()
+    ]  # fmt: skip
+    box.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch",
+                  column_config={**_RATIO_COLS, "NotInject over-blocking": st.column_config.NumberColumn(format="%.3f")})  # fmt: skip
+    box = _card("Training data", "Public sources outside the benchmark, plus generated hard negatives")
+    box.markdown("\n".join(f"- {s}" for s in clf.get("training_sources") or []))
+
+
 def _classifier(status: dict | None) -> None:
     clf = (status or {}).get("classifier", {})
     if not clf.get("available"):
         st.info(
             f"No trained classifier. {clf.get('detail') or ''}  \nTrain it with `uv run python scripts/train_classifier.py`."
         )
+        return
+    if clf.get("kind") == "cascade":
+        _cascade(clf)
         return
     ds = clf.get("dataset") or {}
     k = st.columns(4)

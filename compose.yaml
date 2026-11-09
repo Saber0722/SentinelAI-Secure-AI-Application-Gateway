@@ -22,6 +22,8 @@ x-sentinel-env: &sentinel-env
   SENTINEL_RATE_LIMIT_PER_MINUTE: ${SENTINEL_RATE_LIMIT_PER_MINUTE:-30}
   SENTINEL_MAX_CONCURRENT_CHATS: ${SENTINEL_MAX_CONCURRENT_CHATS:-6}
   SENTINEL_TRUST_CLIENT_HEADER: "true"
+  SENTINEL_CLASSIFIER_KIND: cascade
+  SENTINEL_TORCH_THREADS: ${SENTINEL_TORCH_THREADS:-2}
 
 x-logging: &logging
   driver: json-file
@@ -68,7 +70,7 @@ services:
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
       interval: 15s
-      start_period: 60s
+      start_period: 180s
       retries: 10
 
   ui:
