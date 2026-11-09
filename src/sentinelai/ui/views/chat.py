@@ -2,11 +2,28 @@
 
 from __future__ import annotations
 
+import time
+from concurrent.futures import ThreadPoolExecutor
+
 import pandas as pd
 import streamlit as st
 
 from sentinelai.ui import client
 from sentinelai.ui.style import STATUS_ICONS, STATUS_LABELS
+
+# Requests run off the script thread so the page can draw the prompt and a live timer while waiting.
+_EXECUTOR = ThreadPoolExecutor(max_workers=8, thread_name_prefix="sentinel-chat")
+_POLL_S = 0.25
+
+_THINKING_CSS = """<style>
+.sentinel-thinking { display: inline-flex; align-items: center; gap: 0.6rem; opacity: 0.75; }
+.sentinel-thinking-spinner {
+  width: 1rem; height: 1rem; border-radius: 50%;
+  border: 2px solid currentColor; border-top-color: transparent;
+  animation: sentinel-spin 0.9s linear infinite;
+}
+@keyframes sentinel-spin { to { transform: rotate(360deg); } }
+</style>"""
 
 EXAMPLES = {
     "Benign question": "What is the warranty period for the Acme ArmBot?",
@@ -80,7 +97,38 @@ def _render(result: dict) -> None:
             _decision_table(result["output"])
 
 
+def _client_headers() -> dict[str, str]:
+    """Identify the browser for the gateway's rate limit, using the address set by the reverse proxy."""
+    forwarded = st.context.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+    return {client.CLIENT_HEADER: forwarded} if forwarded else {}
+
+
+def _ask(prompt: str, headers: dict[str, str]) -> dict:
+    """Runs on a worker thread, so it must not call Streamlit."""
+    try:
+        return {"result": client.post("/api/v1/chat", {"prompt": prompt}, timeout=180, headers=headers)}
+    except Exception as exc:  # shown in the chat; rejected requests and an unreachable API read differently
+        return {"error": str(exc)}
+
+
+def _settle(item: dict) -> None:
+    """Move a finished request's outcome onto its history item."""
+    future = item.get("future")
+    if future is not None and future.done():
+        item.update(future.result())
+        del item["future"], item["started"]
+
+
+def _show_thinking(slot, item: dict) -> None:
+    elapsed = int(time.monotonic() - item["started"])
+    slot.markdown(
+        f'<div class="sentinel-thinking"><span class="sentinel-thinking-spinner"></span>Thinking… {elapsed}s</div>',
+        unsafe_allow_html=True,
+    )
+
+
 def render() -> None:
+    st.markdown(_THINKING_CSS, unsafe_allow_html=True)
     st.title("Secure chat")
     st.caption("Every message goes through the SentinelAI gateway: input checks → model → output checks.")
     history: list[dict] = st.session_state.setdefault("chat_history", [])
@@ -91,24 +139,36 @@ def render() -> None:
         if col.button(label, width="stretch"):
             clicked = text
 
+    # Read the input before drawing the history, so a new prompt appears in this same run.
+    prompt = st.chat_input("Ask AcmeAssist something…") or clicked
+    if prompt:
+        future = _EXECUTOR.submit(_ask, prompt, _client_headers())
+        history.append({"prompt": prompt, "future": future, "started": time.monotonic()})
+
+    waiting = []
     for item in history:
+        _settle(item)
         with st.chat_message("user"):
             st.text(item["prompt"])
         with st.chat_message("assistant", avatar=":material/shield:"):
-            if "error" in item:
+            if "future" in item:
+                slot = st.empty()
+                _show_thinking(slot, item)
+                waiting.append((item, slot))
+            elif "error" in item:
                 st.error(item["error"], icon=":material/cloud_off:")
             else:
                 _render(item["result"])
 
-    prompt = st.chat_input("Ask AcmeAssist something…") or clicked
-    if prompt:
-        try:
-            history.append({"prompt": prompt, "result": client.post("/api/v1/chat", {"prompt": prompt}, timeout=180)})
-        except client.ApiError as exc:
-            # Rejected requests (empty/too long) and an unreachable API are shown distinctly.
-            history.append({"prompt": prompt, "error": str(exc)})
-        st.rerun()
-
     if history and st.button("Clear conversation", icon=":material/delete:"):
         history.clear()
         st.rerun()
+
+    # Every Streamlit call here is also where a new prompt or click can interrupt this run. The
+    # requests carry on in the background and are picked up from the history on the next run.
+    while waiting:
+        time.sleep(_POLL_S)
+        if any(item["future"].done() for item, _ in waiting):
+            st.rerun()
+        for item, slot in waiting:
+            _show_thinking(slot, item)

@@ -94,3 +94,28 @@ def test_inference_runs_roundtrip(memory_audit):
     assert {r["kind"] for r in memory_audit.inference_runs()} == {"inference", "live_security"}
     (run,) = memory_audit.inference_runs(kind="inference")
     assert run["metrics"]["tokens_per_s_p50"] == 176.5 and run["device"] == "gpu"
+
+
+def test_scrub_filter_keeps_uvicorn_access_args_formattable():
+    from uvicorn.logging import AccessFormatter
+
+    flt = SecretScrubFilter(lambda s: s.replace("TOPSECRET", "[SECRET_REDACTED]"))
+    formatter = AccessFormatter('%(client_addr)s "%(request_line)s" %(status_code)s', use_colors=False)
+
+    def make(path: str) -> logging.LogRecord:
+        args = ("1.2.3.4:5", "GET", path, "1.1", 200)
+        return logging.LogRecord("uvicorn.access", logging.INFO, __file__, 1, '%s - "%s %s HTTP/%s" %d', args, None)
+
+    clean = make("/health")
+    assert flt.filter(clean) and "/health" in formatter.format(clean)
+
+    secret = make("/x?key=TOPSECRET")
+    assert flt.filter(secret)
+    line = formatter.format(secret)
+    assert "TOPSECRET" not in line and "[SECRET_REDACTED]" in line and "200" in line
+
+
+def test_scrub_filter_catches_secret_split_between_template_and_args():
+    flt = SecretScrubFilter(lambda s: s.replace("key=TOPSECRET", "[SECRET_REDACTED]"))
+    record = logging.LogRecord("sentinelai", logging.INFO, __file__, 1, "key=%s", ("TOPSECRET",), None)
+    assert flt.filter(record) and record.getMessage() == "[SECRET_REDACTED]"

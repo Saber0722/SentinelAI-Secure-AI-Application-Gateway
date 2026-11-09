@@ -179,6 +179,9 @@ All settings are environment variables with the `SENTINEL_` prefix, or entries i
 | `AUDIT_STORE_REDACTED_PROMPT` | `false` | also store prompts *after* redaction (truncated to 300 chars) |
 | `SPACY_MODEL` | `en_core_web_sm` | e.g. `en_core_web_lg` for better name recall (install it explicitly) |
 | `DB_PATH` | `var/sentinel.db` | SQLite audit database |
+| `RATE_LIMIT_PER_MINUTE` | `0` | requests per client per minute on chat and scan (HTTP 429); `0` = off |
+| `MAX_CONCURRENT_CHATS` | `0` | simultaneous chats before refusing with HTTP 503; `0` = off |
+| `TRUST_CLIENT_HEADER` | `false` | identify clients by `X-Sentinel-Client`; enable only if nothing but the UI can reach the API |
 
 The **security policy** (thresholds, PII/secret actions, entity list, output denylist) has safe defaults in
 `SecurityPolicy` (`src/sentinelai/config.py`). It can be changed only via the authenticated

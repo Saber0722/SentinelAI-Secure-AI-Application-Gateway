@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hmac
 import time
+from collections.abc import Iterator
+from contextlib import contextmanager
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
@@ -30,6 +32,8 @@ from sentinelai.gateway.pipeline import InputValidationError
 from sentinelai.models import GenerationConfig, build_model
 
 router = APIRouter()
+
+CLIENT_HEADER = "x-sentinel-client"
 
 
 def get_state(request: Request) -> AppState:
@@ -82,6 +86,36 @@ def status(state: State) -> dict[str, Any]:
     }
 
 
+def _client_key(state: AppState, request: Request) -> str:
+    if state.settings.trust_client_header and (supplied := request.headers.get(CLIENT_HEADER, "").strip()):
+        return supplied[:64]
+    return request.client.host if request.client else "unknown"
+
+
+def _enforce_rate_limit(state: AppState, request: Request) -> None:
+    if state.rate_limiter is None:
+        return
+    allowed, first_refusal = state.rate_limiter.check(_client_key(state, request))
+    if not allowed:
+        if first_refusal:
+            state.gateway.record_rejection(request.state.request_id, "request rate limit exceeded")
+        raise HTTPException(429, "Too many requests. Please wait a minute and try again.", headers={"Retry-After": "60"})
+
+
+@contextmanager
+def _chat_slot(state: AppState) -> Iterator[None]:
+    """Refuse rather than queue, so a burst cannot pile up requests behind one CPU-bound model."""
+    if state.chat_slots is None:
+        yield
+        return
+    if not state.chat_slots.acquire(blocking=False):
+        raise HTTPException(503, "The assistant is busy. Please try again shortly.", headers={"Retry-After": "10"})
+    try:
+        yield
+    finally:
+        state.chat_slots.release()
+
+
 def _validated(state: AppState, request: Request, prompt: str) -> None:
     try:
         state.gateway.validate(prompt)
@@ -92,9 +126,11 @@ def _validated(state: AppState, request: Request, prompt: str) -> None:
 
 @router.post("/api/v1/chat", response_model=ChatResponse)
 def chat(body: ChatRequest, request: Request, state: State) -> ChatResponse:
+    _enforce_rate_limit(state, request)
     _validated(state, request, body.prompt)
     try:
-        r = state.gateway.chat(body.prompt, request_id=request.state.request_id)
+        with _chat_slot(state):
+            r = state.gateway.chat(body.prompt, request_id=request.state.request_id)
     except InputValidationError as exc:
         raise HTTPException(exc.status_code, str(exc)) from None
     return ChatResponse(
@@ -118,6 +154,7 @@ def chat(body: ChatRequest, request: Request, state: State) -> ChatResponse:
 
 @router.post("/api/v1/scan", response_model=ScanResponse)
 def scan(body: ScanRequest, request: Request, state: State) -> ScanResponse:
+    _enforce_rate_limit(state, request)
     _validated(state, request, body.prompt)
     try:
         request_id, analysis = state.gateway.scan(body.prompt, request_id=request.state.request_id)

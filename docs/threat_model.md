@@ -62,7 +62,7 @@ directly; supply-chain compromise of dependencies; denial of service beyond basi
   re-encoded in a novel way (translated, split across messages), would pass.
 - **PII detection is probabilistic.** It misses obfuscated e-mail addresses, unusual formats and many names,
   and it is English-only.
-- **The admin token is a single shared secret** with no rate limiting or rotation; it is adequate for a
+- **The admin token is a single shared secret** with no lockout or rotation; it is adequate for a
   local single-operator tool, not for multi-user deployment.
 - **Pickle-based classifier artifacts** execute code on load; the integrity check does not protect against an
   attacker who can write to `models/`.

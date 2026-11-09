@@ -1,0 +1,15 @@
+# Public entry point. SITE_ADDRESS is the VM's DNS name in production (Caddy then gets a
+# Let's Encrypt certificate automatically); it defaults to plain HTTP on :80 for local testing.
+{$SITE_ADDRESS::80} {
+	encode gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		-Server
+	}
+	# Chat is Streamlit's default page, so it lives at / and /chat would open a "Page not found" dialog.
+	@chat path /chat /chat/
+	redir @chat / 302
+	reverse_proxy ui:8501
+}

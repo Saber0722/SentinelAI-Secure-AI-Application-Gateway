@@ -8,6 +8,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any
 
+from sentinelai.api.limits import SlidingWindowLimiter
 from sentinelai.audit import AuditLogger
 from sentinelai.config import Settings
 from sentinelai.detectors.ml_classifier import ClassifierUnavailable, MlClassifier
@@ -28,6 +29,8 @@ class AppState:
     audit: AuditLogger
     gateway: SecurityGateway
     classifier_error: str | None = None
+    rate_limiter: SlidingWindowLimiter | None = None
+    chat_slots: threading.BoundedSemaphore | None = None
     started_at: float = field(default_factory=time.time)
     _eval_lock: threading.Lock = field(default_factory=threading.Lock)
 
@@ -65,7 +68,15 @@ class AppState:
         gateway = SecurityGateway(
             policy, model, audit, secrets, pii=pii, classifier=classifier, max_input_chars=settings.max_input_chars
         )
-        return cls(settings=settings, db=db, audit=audit, gateway=gateway, classifier_error=classifier_error)
+        return cls(
+            settings=settings,
+            db=db,
+            audit=audit,
+            gateway=gateway,
+            classifier_error=classifier_error,
+            rate_limiter=SlidingWindowLimiter(settings.rate_limit_per_minute) if settings.rate_limit_per_minute else None,
+            chat_slots=threading.BoundedSemaphore(settings.max_concurrent_chats) if settings.max_concurrent_chats else None,
+        )
 
     def classifier_status(self) -> dict[str, Any]:
         clf = self.gateway.classifier

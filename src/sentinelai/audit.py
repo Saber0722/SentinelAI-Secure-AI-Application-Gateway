@@ -252,9 +252,15 @@ class SecretScrubFilter(logging.Filter):
         try:
             message = record.getMessage()
         except (TypeError, ValueError):
-            message = str(record.msg)
-        record.msg = self._scrub(message)
-        record.args = None
+            record.msg, record.args = self._scrub(str(record.msg)), None
+        else:
+            clean = self._scrub(message)
+            if clean != message:
+                if record.name == "uvicorn.access" and isinstance(record.args, tuple):
+                    # Uvicorn's access formatter unpacks these, so they must stay a tuple.
+                    record.args = tuple(self._scrub(a) if isinstance(a, str) else a for a in record.args)
+                else:
+                    record.msg, record.args = clean, None
         if record.exc_info and record.exc_info[1] is not None:
             # Keep the exception type, drop its message (may contain user content).
             record.exc_text = f"{type(record.exc_info[1]).__name__} (details scrubbed)"

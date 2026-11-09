@@ -155,6 +155,12 @@ class Settings(BaseSettings):
     audit_store_redacted_prompt: bool = False
     admin_token: SecretStr | None = None
 
+    # Abuse limits for a public deployment; 0 disables each one.
+    rate_limit_per_minute: int = Field(0, ge=0)
+    max_concurrent_chats: int = Field(0, ge=0)
+    # Identify clients by the UI-supplied header. Only safe when nothing but the UI can reach the API.
+    trust_client_header: bool = False
+
     api_host: str = "127.0.0.1"
     api_port: int = 8000
 

@@ -8,6 +8,7 @@ from typing import Any
 import httpx
 
 API_URL = os.environ.get("SENTINEL_API_URL", "http://127.0.0.1:8000")
+CLIENT_HEADER = "X-Sentinel-Client"
 
 
 class ApiError(RuntimeError):

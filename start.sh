@@ -162,7 +162,7 @@ DASHBOARD="http://127.0.0.1:$UI_PORT/dashboard"
 echo
 info "SentinelAI is running"
 echo "    Dashboard : $DASHBOARD"
-echo "    Chat      : http://127.0.0.1:$UI_PORT/chat"
+echo "    Chat      : http://127.0.0.1:$UI_PORT/"
 echo "    API docs  : http://127.0.0.1:$API_PORT/docs"
 echo "    Model     : $MODEL on $DEVICE (${placement:-unknown})"
 if [[ "${GENERATED_TOKEN:-0}" == 1 ]]; then

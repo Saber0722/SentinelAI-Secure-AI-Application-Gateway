@@ -75,7 +75,9 @@ asserts the *current* behaviour so a change is noticed.
 
 ## Operational
 
-- Single shared admin token: no users, roles, rate limiting or rotation. Out of scope by design.
+- Single shared admin token: no users, roles, lockout or rotation. Out of scope by design.
+- Rate limits are optional and held in memory, so they reset on restart. They identify clients by network
+  address, so people behind one shared address (a campus network, for example) share one allowance.
 - Runtime policy and model changes made through the admin API live in memory and are reset on restart
   (`.env` defines the startup state). Every change is recorded as a `policy_change` audit event.
 - The admin denylist accepts arbitrary regular expressions from the operator; a pathological pattern could
