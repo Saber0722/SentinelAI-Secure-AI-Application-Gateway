@@ -1,0 +1,255 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200" font-family="Inter, 'Segoe UI', system-ui, -apple-system, Helvetica, Arial, sans-serif">
+  <title>SentinelAI architecture: request flow</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#c43c3c"/></marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2b8a50"/></marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2f66c4"/></marker>
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8a94a6"/></marker>
+    <style>
+      .t  { font-size: 14px; font-weight: 650; fill: #1f2937; text-anchor: middle; }
+      .s  { font-size: 11px; fill: #4b5563; text-anchor: middle; }
+      .xs { font-size: 10px; fill: #4b5563; text-anchor: middle; }
+      .mono { font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace; }
+      .band-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; fill: #475569; }
+      .box   { fill: #ffffff; stroke: #94a3b8; stroke-width: 1.3; }
+      .det   { fill: #ffffff; stroke: #3d6fd1; stroke-width: 1.5; }
+      .core  { fill: #fff8e8; stroke: #c98a12; stroke-width: 1.6; }
+      .red   { fill: #fdeeee; stroke: #c43c3c; stroke-width: 1.5; }
+      .blue  { fill: #ebf2fd; stroke: #2f66c4; stroke-width: 1.5; }
+      .green { fill: #eaf7ef; stroke: #2b8a50; stroke-width: 1.5; }
+      .flow  { fill: none; stroke: #475569; stroke-width: 1.6; }
+      .fred  { fill: none; stroke: #c43c3c; stroke-width: 1.8; }
+      .fgreen{ fill: none; stroke: #2b8a50; stroke-width: 1.8; }
+      .fblue { fill: none; stroke: #2f66c4; stroke-width: 1.8; }
+      .faudit{ fill: none; stroke: #8a94a6; stroke-width: 1.5; stroke-dasharray: 6 4; }
+      .lbl-red   { font-size: 10px; font-weight: 600; fill: #c43c3c; }
+      .lbl-green { font-size: 10.5px; font-weight: 600; fill: #2b8a50; }
+      .lbl-gray  { font-size: 10.5px; fill: #64748b; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1200" fill="#f8fafc"/>
+
+  <!-- Title -->
+  <text x="40" y="36" font-size="22" font-weight="700" fill="#111827">SentinelAI: request flow</text>
+  <text x="40" y="58" font-size="12.5" fill="#4b5563">Every chat message passes through one gateway path: input checks, then the model, then output checks. Blocked requests never reach the model.</text>
+
+  <!-- User's browser (outside the VM) -->
+  <rect class="box" x="40" y="75" width="220" height="58" rx="8"/>
+  <text class="t" x="150" y="98">User's browser</text>
+  <text class="s" x="150" y="116">HTTPS (port 443)</text>
+  <path class="flow" d="M150 133 V183" marker-end="url(#arrow)"/>
+
+  <!-- Azure VM boundary -->
+  <rect x="20" y="150" width="1565" height="1000" rx="14" fill="none" stroke="#64748b" stroke-width="1.4" stroke-dasharray="10 6"/>
+  <text x="1570" y="1140" font-size="11.5" fill="#64748b" text-anchor="end">Azure VM (Standard_B2as_v2) · Docker Compose on a private network: caddy · ui · api · ollama</text>
+
+  <!-- Background bands (drawn first so arrows sit on top) -->
+  <rect x="40" y="285" width="1520" height="290" rx="10" fill="#eef3fc" stroke="#c9d7f2"/>
+  <text class="band-label" x="60" y="308">1 · INPUT CHECKS</text>
+  <rect x="40" y="595" width="1520" height="150" rx="10" fill="#f4f1fc" stroke="#dcd3f2"/>
+  <text class="band-label" x="60" y="618">2 · MODEL CALL</text>
+  <rect x="40" y="765" width="1520" height="225" rx="10" fill="#edf8f1" stroke="#cbe8d5"/>
+  <text class="band-label" x="60" y="788">3 · OUTPUT CHECKS</text>
+
+  <!-- Top row: edge services -->
+  <rect class="box" x="40" y="185" width="220" height="80" rx="8"/>
+  <text class="t" x="150" y="210">Caddy reverse proxy</text>
+  <text class="s" x="150" y="228">TLS certificates</text>
+  <text class="s" x="150" y="244">sets X-Forwarded-For</text>
+
+  <rect class="box" x="320" y="185" width="260" height="80" rx="8"/>
+  <text class="t" x="450" y="210">Streamlit UI</text>
+  <text class="s" x="450" y="228">Chat · Dashboard · Audit · Settings</text>
+  <text class="s" x="450" y="244">prompt shown instantly + "Thinking…" timer</text>
+
+  <rect class="box" x="640" y="185" width="300" height="80" rx="8"/>
+  <text class="t" x="790" y="210">FastAPI gateway</text>
+  <text class="s mono" x="790" y="228">POST /api/v1/chat</text>
+  <text class="s" x="790" y="244">schema check · size limit · per-client rate limit</text>
+
+  <rect class="box" x="1230" y="185" width="300" height="80" rx="8"/>
+  <text class="t" x="1380" y="210">Response</text>
+  <text class="s" x="1380" y="228">status · answer or refusal</text>
+  <text class="s" x="1380" y="244">findings · risk score · timings</text>
+
+  <path class="flow" d="M260 225 H318" marker-end="url(#arrow)"/>
+  <path class="flow" d="M580 225 H638" marker-end="url(#arrow)"/>
+  <!-- response back to the UI -->
+  <path class="flow" d="M1380 185 V170 H450 V183" marker-end="url(#arrow)"/>
+  <text class="lbl-gray" x="915" y="164" text-anchor="middle">rendered with a "Why?" security explanation</text>
+  <!-- gateway into input checks -->
+  <path class="flow" d="M790 265 V275 H210 V378" marker-end="url(#arrow)"/>
+
+  <!-- ===== Band 1: input checks ===== -->
+
+  <rect class="box" x="70" y="380" width="150" height="90" rx="8"/>
+  <text class="t" x="145" y="404">Validate</text>
+  <text class="s" x="145" y="422">≤ 8,000 characters</text>
+  <text class="s" x="145" y="438">unknown fields → 422</text>
+  <text class="s" x="145" y="454">invalid → rejected</text>
+  <path class="flow" d="M220 425 H253" marker-end="url(#arrow)"/>
+
+  <rect class="box" x="255" y="365" width="210" height="120" rx="8"/>
+  <text class="t" x="360" y="390">Normalize</text>
+  <text class="s" x="360" y="410">NFKC, strip invisible characters</text>
+  <text class="s" x="360" y="426">matching view: homoglyphs,</text>
+  <text class="s" x="360" y="442">leetspeak, split letters</text>
+  <text class="s" x="360" y="458">decode base64 tokens</text>
+  <text class="xs" x="360" y="476">(the model only gets the safe view)</text>
+
+  <!-- fan-out to detectors -->
+  <path class="flow" d="M465 425 H485 V329 H503" marker-end="url(#arrow)"/>
+  <path class="flow" d="M485 425 V395 H503" marker-end="url(#arrow)"/>
+  <path class="flow" d="M485 425 V461 H503" marker-end="url(#arrow)"/>
+  <path class="flow" d="M485 425 V532 H503" marker-end="url(#arrow)"/>
+
+  <rect class="det" x="505" y="300" width="325" height="58" rx="8"/>
+  <text class="t" x="667.5" y="322">Rule detector</text>
+  <text class="s" x="667.5" y="340">34 weighted regexes · 5 attack categories · noisy-OR</text>
+
+  <rect class="det" x="505" y="366" width="325" height="58" rx="8"/>
+  <text class="t" x="667.5" y="388">Secrets detector</text>
+  <text class="s" x="667.5" y="406">protected values · canary · 11 credential patterns</text>
+
+  <rect class="det" x="505" y="432" width="325" height="58" rx="8"/>
+  <text class="t" x="667.5" y="454">PII detector</text>
+  <text class="s" x="667.5" y="472">Presidio + spaCy · names, emails, phones, IDs</text>
+
+  <rect class="det" x="505" y="498" width="325" height="68" rx="8"/>
+  <text class="t" x="667.5" y="520">Transformer cascade</text>
+  <text class="s" x="667.5" y="537">own DeBERTa-v3-small + ProtectAI DeBERTa v2</text>
+  <text class="s" x="667.5" y="553">both fire → BLOCK · one fires → WARN · veto</text>
+
+  <!-- merge into the policy engine -->
+  <path class="flow" d="M830 329 H850 M830 395 H850 M830 461 H850 M830 532 H850 M850 329 V532"/>
+  <path class="flow" d="M850 430 H868" marker-end="url(#arrow)"/>
+
+  <rect class="core" x="870" y="380" width="220" height="100" rx="8"/>
+  <text class="t" x="980" y="405">Policy engine</text>
+  <text class="s mono" x="980" y="423">decide_input</text>
+  <text class="s" x="980" y="443">highest action wins:</text>
+  <text class="xs" x="980" y="460">BLOCK › REVIEW › REDACT › WARN › ALLOW</text>
+  <path class="flow" d="M1090 430 H1118" marker-end="url(#arrow)"/>
+
+  <polygon points="1120,430 1170,385 1220,430 1170,475" fill="#ffffff" stroke="#c98a12" stroke-width="1.6"/>
+  <text class="t" x="1170" y="435" font-size="13">action?</text>
+
+  <path class="fred" d="M1220 430 H1288" marker-end="url(#arrow-red)"/>
+  <text class="lbl-red" x="1236" y="468" text-anchor="middle" font-size="9.5">BLOCK / REVIEW</text>
+
+  <rect class="red" x="1290" y="390" width="240" height="80" rx="8"/>
+  <text class="t" x="1410" y="413">Refused before the model</text>
+  <text class="s" x="1410" y="431">BLOCK → request blocked</text>
+  <text class="s" x="1410" y="446">REVIEW → held for review</text>
+  <text class="s" x="1410" y="461">the model is never called</text>
+  <path class="fred" d="M1530 430 H1550"/>
+
+  <path class="fgreen" d="M1170 475 V633" marker-end="url(#arrow-green)"/>
+  <text class="lbl-green" x="1180" y="560">ALLOW · WARN · REDACT</text>
+
+  <!-- ===== Band 2: model call ===== -->
+
+  <rect class="box" x="1080" y="635" width="180" height="85" rx="8"/>
+  <text class="t" x="1170" y="659">Redact spans</text>
+  <text class="s" x="1170" y="677">PII and secrets replaced</text>
+  <text class="s mono" x="1170" y="694" font-size="10">[TYPE_REDACTED]</text>
+  <path class="flow" d="M1080 677 H1012" marker-end="url(#arrow)"/>
+
+  <rect class="box" x="720" y="635" width="290" height="85" rx="8"/>
+  <text class="t" x="865" y="659">Model adapter</text>
+  <text class="s mono" x="865" y="677" font-size="10">system prompt + &lt;user_input&gt;…&lt;/user_input&gt;</text>
+  <text class="s" x="865" y="695">failure → inference_error (fails closed)</text>
+
+  <path class="flow" d="M720 677 H690 M690 637 V704"/>
+  <path class="flow" d="M690 637 H632" marker-end="url(#arrow)"/>
+  <path class="flow" d="M690 704 H632" marker-end="url(#arrow)"/>
+
+  <rect class="box" x="330" y="610" width="300" height="55" rx="8"/>
+  <text class="t" x="480" y="632">Ollama · qwen2.5:1.5b</text>
+  <text class="s" x="480" y="650">separate container · CPU on Azure</text>
+
+  <rect class="box" x="330" y="678" width="300" height="52" rx="8" stroke-dasharray="5 3"/>
+  <text class="t" x="480" y="699">MockModel</text>
+  <text class="s" x="480" y="716">deterministic, deliberately leaky (tests)</text>
+
+  <path class="flow" d="M865 720 V788" marker-end="url(#arrow)"/>
+  <text class="lbl-gray" x="875" y="760">raw answer</text>
+
+  <!-- ===== Band 3: output checks ===== -->
+
+  <rect x="545" y="790" width="490" height="190" rx="10" fill="#ffffff" fill-opacity="0.55" stroke="#9fb3c8" stroke-dasharray="5 3"/>
+  <text class="xs" x="790" y="808">scanners run on the raw answer</text>
+
+  <rect class="det" x="560" y="818" width="225" height="70" rx="8"/>
+  <text class="t" x="672.5" y="845">Protected secrets &amp; canary</text>
+  <text class="s" x="672.5" y="864">exact · base64 · hex · reversed</text>
+
+  <rect class="det" x="800" y="818" width="220" height="70" rx="8"/>
+  <text class="t" x="910" y="845">Credential patterns</text>
+  <text class="s" x="910" y="864">API keys, tokens, passwords</text>
+
+  <rect class="det" x="560" y="898" width="225" height="70" rx="8"/>
+  <text class="t" x="672.5" y="925">System-prompt leak</text>
+  <text class="s" x="672.5" y="944">6-word overlap · operator denylist</text>
+
+  <rect class="det" x="800" y="898" width="220" height="70" rx="8"/>
+  <text class="t" x="910" y="925">PII in the answer</text>
+  <text class="s" x="910" y="944">emails, phones, cards (not names)</text>
+
+  <path class="flow" d="M1035 885 H1088" marker-end="url(#arrow)"/>
+
+  <rect class="core" x="1090" y="835" width="190" height="100" rx="8"/>
+  <text class="t" x="1185" y="862">Policy engine</text>
+  <text class="s mono" x="1185" y="880">decide_output</text>
+  <text class="s" x="1185" y="900">withhold, redact or pass</text>
+
+  <path class="flow" d="M1280 885 H1305 M1305 817 V953"/>
+  <path class="fred" d="M1305 817 H1328" marker-end="url(#arrow-red)"/>
+  <path class="fblue" d="M1305 885 H1328" marker-end="url(#arrow-blue)"/>
+  <path class="fgreen" d="M1305 953 H1328" marker-end="url(#arrow-green)"/>
+
+  <rect class="red" x="1330" y="790" width="200" height="55" rx="8"/>
+  <text class="t" x="1430" y="812">Answer withheld</text>
+  <text class="s" x="1430" y="830">secret, canary or prompt leak</text>
+
+  <rect class="blue" x="1330" y="858" width="200" height="55" rx="8"/>
+  <text class="t" x="1430" y="880">Answer, redacted</text>
+  <text class="s" x="1430" y="898">PII or credential masked</text>
+
+  <rect class="green" x="1330" y="926" width="200" height="55" rx="8"/>
+  <text class="t" x="1430" y="948">Answer as generated</text>
+  <text class="s" x="1430" y="966">ALLOW, or WARN (flagged)</text>
+
+  <!-- return bus to the response -->
+  <path class="flow" d="M1530 817 H1550 M1530 885 H1550 M1530 953 H1550"/>
+  <path class="flow" d="M1550 953 V225 H1532" marker-end="url(#arrow)"/>
+
+  <!-- ===== Audit and monitoring ===== -->
+  <path class="faudit" d="M1550 953 V1065 H1032" marker-end="url(#arrow-gray)"/>
+  <text class="lbl-gray" x="1290" y="1057" text-anchor="middle">every request, including blocked and rejected ones</text>
+
+  <rect class="box" x="600" y="1025" width="430" height="80" rx="8"/>
+  <text class="t" x="815" y="1050">SQLite audit log</text>
+  <text class="s" x="815" y="1068">one event per request: statuses, findings, timings,</text>
+  <text class="s" x="815" y="1084">HMAC fingerprint, redacted text · never the raw prompt</text>
+
+  <path class="faudit" d="M600 1065 H492" marker-end="url(#arrow-gray)"/>
+
+  <rect class="box" x="70" y="1025" width="420" height="80" rx="8"/>
+  <text class="t" x="280" y="1050">Dashboard &amp; Audit pages</text>
+  <text class="s mono" x="280" y="1068" font-size="10">GET /api/v1/metrics · GET /api/v1/events</text>
+  <text class="s" x="280" y="1084">live statistics, filters, auto-refresh</text>
+
+  <!-- Legend -->
+  <g transform="translate(40,1172)" font-size="11.5" fill="#374151">
+    <path class="flow" d="M0 0 H34" marker-end="url(#arrow)"/><text x="44" y="4">request flow</text>
+    <path class="fgreen" d="M150 0 H184" marker-end="url(#arrow-green)"/><text x="194" y="4">allowed to continue</text>
+    <path class="fred" d="M340 0 H374" marker-end="url(#arrow-red)"/><text x="384" y="4">refused or withheld</text>
+    <path class="fblue" d="M530 0 H564" marker-end="url(#arrow-blue)"/><text x="574" y="4">redacted</text>
+    <path class="faudit" d="M650 0 H684" marker-end="url(#arrow-gray)"/><text x="694" y="4">audit and monitoring</text>
+    <rect class="det" x="850" y="-8" width="22" height="16" rx="3"/><text x="880" y="4">detector</text>
+    <rect class="core" x="950" y="-8" width="22" height="16" rx="3"/><text x="980" y="4">decision point</text>
+  </g>
+</svg>

@@ -76,6 +76,16 @@ _GENERIC: tuple[tuple[str, re.Pattern[str], int], ...] = (
     ),
 )
 
+# What follows "password =" in code or in a redacted answer, rather than a credential. Protected secrets are matched
+# separately, so a real value can never be excused by this list.
+_NOT_A_VALUE = re.compile(
+    r"\[[A-Z_]+_REDACTED\]"  # our own placeholder, repeated by the model
+    r"|<[^>]*>|\{[^}]*\}|\$\{\w+\}|\$[A-Z_]+"  # template and shell placeholders
+    r"|(?:self|cls|this|config|settings|cfg)\.[A-Za-z_][\w.]*"  # attribute references
+    r"|os\.(?:environ|getenv).*|process\.env.*|getenv\(.*"  # read from the environment
+    r"|(?i:your[_-].*|string|password|passwd|pwd|secret|api[_-]?key|access[_-]?token|auth[_-]?token|client[_-]?secret)"
+)
+
 _ID_MENTION = re.compile(r"[a-z0-9]+(?:_[a-z0-9]+)+")
 
 
@@ -130,6 +140,8 @@ class SecretsDetector:
         by_label: dict[str, list[Span]] = {}
         for label, pattern, group in _GENERIC:
             for m in pattern.finditer(text):
+                if group and _NOT_A_VALUE.fullmatch(m.group(group)):
+                    continue
                 start, end = m.span(group)
                 by_label.setdefault(label, []).append(Span(start, end, label))
         findings = []

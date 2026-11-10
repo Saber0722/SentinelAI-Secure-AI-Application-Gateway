@@ -190,8 +190,11 @@ The **security policy** (thresholds, PII/secret actions, entity list, output den
 ## Testing and evaluation
 
 ```bash
-uv run pytest                               # 207 unit, integration and security-property tests
-uv run pytest --cov                         # 96% coverage (Streamlit pages excluded)
+uv run --extra guards pytest                # 435 unit, integration and security tests (8 tracked known gaps)
+uv run --extra guards pytest --cov          # 97% coverage (Streamlit pages excluded)
+uv run playwright install chromium          # once, before the browser tests
+uv run pytest tests/e2e --browser chromium  # 16 browser tests against an isolated local stack
+uv run python tests/e2e/record_demo.py      # records SentinelAI_Demo.mp4 from the live site (adds to its audit log)
 uv run ruff check src tests scripts         # lint
 uv run python scripts/evaluate_security.py  # benchmark → docs/benchmark_report.md, results/benchmark_latest.json
 uv run python scripts/evaluate_security.py --live 20   # + real local LLM security run through Ollama

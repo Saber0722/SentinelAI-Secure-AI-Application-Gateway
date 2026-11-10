@@ -57,6 +57,11 @@ class InputValidationError(ValueError):
         self.status_code = status_code
 
 
+# The small spaCy model tags ordinary words in generated prose ("Navigate", "git diff") as names, which corrupts answers.
+# Names in user input are still removed before the model sees them.
+_NOT_SCANNED_IN_OUTPUT = frozenset({"PERSON"})
+
+
 def build_system_prompt(secrets: SecretsConfig) -> str:
     """System prompt of the protected demo application.
 
@@ -210,7 +215,8 @@ class SecurityGateway:
         if not policy.output_scanning_enabled:
             return Decision(Action.ALLOW, 0.0, [], ["Output scanning disabled"]), text, 0
         findings = self.secrets.scan(text) + self.output_policy.analyze(text, policy.output_denylist)
-        findings += self.pii.analyze(text, policy.pii_entities, policy.pii_min_score)
+        entities = [e for e in policy.pii_entities if e not in _NOT_SCANNED_IN_OUTPUT]
+        findings += self.pii.analyze(text, entities, policy.pii_min_score)
         decision = decide_output(findings, policy)
         if decision.action is Action.REDACT_AND_ALLOW:
             redacted, n = redact(text, [f for f in findings if f.category in _REDACTABLE])

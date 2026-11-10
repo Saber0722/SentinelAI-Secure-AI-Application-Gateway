@@ -37,8 +37,10 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "playwright>=1.64.1",
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",
+    "pytest-playwright>=0.10.0",
     "ruff>=0.17.2",
 ]
 
@@ -46,8 +48,10 @@ dev = [
 en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl" }
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# Browser tests start real servers, so they only run when asked for: uv run pytest tests/e2e
+testpaths = ["tests/unit", "tests/integration", "tests/security"]
 addopts = "-q -p no:cacheprovider"
+markers = ["e2e: browser tests that drive the running UI with Playwright"]
 filterwarnings = [
     "ignore:Using `httpx` with `starlette.testclient` is deprecated",
 ]

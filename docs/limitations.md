@@ -52,6 +52,10 @@ asserts the *current* behaviour so a change is noticed.
 
 ## Output scanning
 
+- **Person names in model answers are not redacted.** The small spaCy model tagged ordinary words in generated text
+  ("Navigate", "git diff") as names, which corrupted answers. Names are still removed from user input before inference,
+  and emails, phone numbers, card numbers and credentials in answers are still handled. A name the model produces is
+  shown, so output case `o-017` now counts as a mismatch in the benchmark (the case is deliberately left unchanged).
 - It filters **content, not correctness**. Nothing here evaluates whether an answer is true or safe advice.
 - It catches configured secrets (exact, separator-obfuscated, reversed, hex, base64), the canary token,
   credential *patterns* and near-verbatim system-prompt reproduction. It does **not** catch paraphrased
